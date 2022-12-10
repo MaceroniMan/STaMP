@@ -1,0 +1,26 @@
+OPEN: mstr
+OMG OMG
+OMG OMG
+CLOSE: mstr
+
+# above is DONE
+
+SPLIT: mstr ON newline
+
+SPLIT: mstr ON spaces
+
+STRIP: mstr
+
+mstr{0}
+
+APPEND: ", " TO mstr
+
+MERGE: mstr
+
+mstr {:-2}
+
+APPEND: "(" TO mstr
+
+PREPEND: ")" TO mstr
+
+OUT: mstr

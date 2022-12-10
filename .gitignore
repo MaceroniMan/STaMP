@@ -1,0 +1,14 @@
+/dev/
+**/__pycache__
+.breakpoints
+.pip_output
+poetry.lock
+pyproject.toml
+main.py
+main.poml
+main
+src
+.pomrun.py
+.replit
+/venv/
+replit.nix

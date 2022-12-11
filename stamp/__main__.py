@@ -2,8 +2,16 @@ import core
 import utilities
 import os
 
+VERSION = "0.1"
+
 def runinterpreter():
   colors = utilities.getcolors()
+
+  if colors["supported"]:
+    print("STaMP - " + VERSION + " - " + colors["green"] + "Extended Colors" + colors["reset"])
+  else:
+    print("STaMP - " + VERSION)
+  
   print("\x1b[?25l", end="")
   
   # setup
@@ -69,4 +77,6 @@ def runinterpreter():
       done = True
 
   print("\x1b[?25h", end="")
-runinterpreter()
+
+if __name__ == "__main__":
+  runinterpreter()

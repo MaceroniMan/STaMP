@@ -1,6 +1,11 @@
+import utilities
+
 def _split(currentelement, splitby):
   if type(currentelement) == str:
-    return currentelement.split(splitby)
+    if splitby == "$CHAR$":
+      return [*currentelement]
+    else:
+      return currentelement.split(splitby)
   else:
     rlist = []
     for item in currentelement:
@@ -28,5 +33,23 @@ def merge(text, textstr, texvar):
   text[texvar] = _merge(text[texvar], textstr)
   return text
 
+def _prettyprint(item, indentlvl, c):
+  rstr = ""
+  if type(item) == str:
+    item = item.replace("\n", c["blue"] + "\\n\n" + c["yellow"])
+    return " "*indentlvl + c["yellow"] + "'" + item + "'" + c["reset"] + ","
+  else:
+    rstr += " "*indentlvl + "[" + "\n"
+    for i in item:
+      ritem = _prettyprint(i, indentlvl+1, c)
+      rstr += ritem + "\n"
+    rstr += " "*indentlvl + "],"
+
+  return rstr
+
 def display(text, texvar):
-  print(text[texvar])
+  c = utilities.getcolors()
+  
+  pp = _prettyprint(text[texvar], 0, c)[:-1]
+
+  print(pp)

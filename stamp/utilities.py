@@ -22,7 +22,8 @@ def getcolors():
     "blue" : "",
     "reset" : "",
     "background" : "",
-    "underline" : ""
+    "underline" : "",
+    "supported" : False
   }
   
   if os.name == "nt":
@@ -35,6 +36,7 @@ def getcolors():
       colors["red"] = colorama.Fore.RED
       colors["background"] = colorama.Back.WHITE
       colors["underline"] = colorama.Style.UNDERLINE
+      colors["supported"] = True
     except:
       pass
   else:
@@ -46,6 +48,8 @@ def getcolors():
     colors["red"] = "\033[31m"
     colors["background"] = "\033[0;30;47m"
     colors["underline"] = "\033[4m"
+    colors["supported"] = True
+
 
   return colors
 
@@ -124,7 +128,7 @@ def error(etype, etext):
 
 def syntaxhighlight(text, textvar):
 
-  matches = re.finditer(r'(ON|AT)|(EXIT|SPLIT|MERGE|OPEN|CLOSE|DISPLAY)|(:)|(".*")|(newline|space)|(\w*)', "".join(text))
+  matches = re.finditer(r'(ON|AT)|(EXIT|SPLIT|MERGE|OPEN|CLOSE|DISPLAY):|{(\d*)}|(".*")|(newline|space|\*\*\*|charecter)|(\w*)', "".join(text))
 
   c = getcolors()
   
@@ -132,7 +136,7 @@ def syntaxhighlight(text, textvar):
     mgps = match.groups()
     spn = match.span(0)
     if mgps[0] != None:
-      text[spn[0]] = c["green"] + text[spn[0]]
+      text[spn[0]] = c["blue"] + text[spn[0]]
       text[spn[1]-1] = text[spn[1]-1] + c["reset"]
       #print(mgps[0] + " OP")
     elif mgps[1] != None:
@@ -140,9 +144,9 @@ def syntaxhighlight(text, textvar):
       text[spn[1]-1] = text[spn[1]-1] + c["reset"]
       #print(mgps[1] + " FCTN")
     elif mgps[2] != None:
-      text[spn[0]] = c["blue"] + text[spn[0]]
+      text[spn[0]] = c["green"] + text[spn[0]]
       text[spn[1]-1] = text[spn[1]-1] + c["reset"]
-      #print(mgps[2] + " SYMB")
+      #print(mgps[2] + " NUMB")
     elif mgps[3] != None:
       text[spn[0]] = c["yellow"] + text[spn[0]]
       text[spn[1]-1] = text[spn[1]-1] + c["reset"]

@@ -6,7 +6,9 @@ import utilities
 def __short(item):
   shorts = {
     "newline" : "\n",
-    "space" : " "
+    "space" : " ",
+    "charecter" : "$CHAR$",
+    "*" : "$CHAR$"
   }
   if item in shorts:
     return shorts[item]
@@ -54,7 +56,7 @@ def run(line, history, text, flags):
           text[flags["fileopen.name"]] = flags["fileopen.text"]
           flags["fileopen"] = False
         else:
-          utilities.error("open error", "ending name is not same as starting name")
+          utilities.error("value error", "ending name is not same as starting name")
       else:
         if flags["fileopen.text"] == "":
           flags["fileopen.text"] += line
@@ -68,6 +70,16 @@ def run(line, history, text, flags):
           textstr = __parsequotes(currentmatch["on_arg"])
           if textstr != None:
             text = functions.split(text, textstr, currentmatch["on_var"])
+          else:
+            utilities.error("syntax error", "invalid string")
+        else:
+          utilities.error("value error", "variable does not exist")
+          
+      if currentmatch["on_cmd"] == "MERGE":
+        if currentmatch["on_var"] in text:
+          textstr = __parsequotes(currentmatch["on_arg"])
+          if textstr != None:
+            text = functions.merge(text, textstr, currentmatch["on_var"])
           else:
             utilities.error("syntax error", "invalid string")
         else:
@@ -111,7 +123,7 @@ def run(line, history, text, flags):
     else:
       utilities.error("syntax error", "no such function exists")
 
-  elif line in ["EXIT", "EXIT:"]:
+  elif line == "EXIT:":
     flags["exit"] = True
   else:
     utilities.error("syntax error", "invalid command")

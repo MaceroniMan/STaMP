@@ -73,7 +73,7 @@ def _link():
   return ord(ch)
 
 def _wink():
-  ord(msvcrt.getch())
+  return ord(msvcrt.getch())
 
 def getch():
   winkeycodes = {
@@ -81,6 +81,7 @@ def getch():
     "224,80" : "down",
     "224,75" : "left",
     "224,77" : "right",
+    "224,83" : "delete",
     "13" : "enter",
     "9" : "tab",
     "8" : "backspace"
@@ -111,6 +112,10 @@ def getch():
     keycode = _link()
     if keycode == 27:
       secondkeycode = str(keycode) + "," + str(_link()) + "," + str(_link())
+      # just to make the delete key work
+      if secondkeycode == "27,91,51":
+        if _link() == 126:
+          return "delete"
       if secondkeycode in linkeycodes:
         return linkeycodes[secondkeycode]
       else:
@@ -136,32 +141,39 @@ def syntaxhighlight(text, textvar):
     mgps = match.groups()
     spn = match.span(0)
     if mgps[0] != None:
-      text[spn[0]] = c["blue"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["blue"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[0] + " OP")
     elif mgps[1] != None:
-      text[spn[0]] = c["blue"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["blue"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[1] + " FCTN")
     elif mgps[2] != None:
-      text[spn[0]] = c["green"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["green"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[2] + " NUMB")
     elif mgps[3] != None:
-      text[spn[0]] = c["yellow"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["yellow"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[3] + " STR")
     elif mgps[4] != None:
-      text[spn[0]] = c["yellow"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["yellow"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[4] + " RPLARG")
     elif mgps[5] in textvar:
-      text[spn[0]] = c["bold"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["bold"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[5] + " VAR")
     elif not mgps[5] in [" ", "", None]:
-      text[spn[0]] = c["underline"] + text[spn[0]]
-      text[spn[1]-1] = text[spn[1]-1] + c["reset"]
+      for i in range(spn[0], spn[1]):
+        text[i] = c["underline"] + text[i]
+        text[i+1] = text[i+1] + c["reset"]
       #print(mgps[5] + " INVLDVAR")
 
   return text

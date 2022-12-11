@@ -65,6 +65,9 @@ def runinterpreter():
         if position > 0:
           endstrarr.pop(position-1)
           position -= 1
+      elif char == "delete":
+        if position < len(endstrarr):
+          endstrarr.pop(position)
       elif char in ["up", "down"]:
         pass
       else:

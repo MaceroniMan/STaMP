@@ -49,7 +49,18 @@ def _prettyprint(item, indentlvl, c):
 
 def display(text, texvar):
   c = utilities.getcolors()
-  
   pp = _prettyprint(text[texvar], 0, c)[:-1]
-
   print(pp)
+
+def _strip(currentelement):
+  if type(currentelement) == str:
+    return currentelement.strip()
+  else:
+    rlist = []
+    for item in currentelement:
+      rlist.append(_strip(item))
+    return rlist
+
+def strip(text, textvar):
+  text[textvar] = _strip(text[textvar])
+  return text

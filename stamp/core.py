@@ -1,5 +1,4 @@
 import re
-import string
 import functions
 import utilities
 
@@ -30,7 +29,7 @@ def __isvarname(text):
   else:
     return False
 
-def run(line, history, text, flags):
+def run(line, history, text, flags, config):
   #((?P<on_cmd>\w+): (?P<on_var>\w+) ON (?P<on_arg>[\w]+|(".+")))
   #((?P<to_cmd>\w+): (?P<to_arg>[\w]+|(".+")) TO (?P<to_var>\w+))
   #((?P<ch_var>\w+)\s*(\{(?P<ch_cond>[-:]*\d*)\}))
@@ -107,6 +106,15 @@ def run(line, history, text, flags):
         if __isvarname(currentmatch["sg_arg"]):
           if currentmatch["sg_arg"] in text:
             functions.display(text, currentmatch["sg_arg"])
+          else:
+            utilities.error("syntax error", "variable does not exist")
+        else:
+          utilities.error("syntax error", "argument must be variable")
+
+      if currentmatch["sg_cmd"] == "STRIP":
+        if __isvarname(currentmatch["sg_arg"]):
+          if currentmatch["sg_arg"] in text:
+            functions.strip(text, currentmatch["sg_arg"])
           else:
             utilities.error("syntax error", "variable does not exist")
         else:

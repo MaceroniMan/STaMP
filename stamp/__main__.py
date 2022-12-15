@@ -1,22 +1,27 @@
 import core
 import utilities
-import os
+import sys
+import argparse
 
-VERSION = "0.1"
+VERSION = "0.2"
 
-def runinterpreter():
+def versionstamp():
   colors = utilities.getcolors()
 
   if colors["supported"]:
-    print("STaMP - " + VERSION + " - " + colors["green"] + "Extended Colors" + colors["reset"])
+    print("STaMP Interpreter - " + VERSION + " - " + colors["green"] + "Extended " + colors["blue"] + "Colors" + colors["reset"])
   else:
-    print("STaMP - " + VERSION)
+    print("STaMP Interpreter - " + VERSION)
+
+  return colors
+
+def runinterpreter(config, text):
+  colors = versionstamp()
   
   print("\x1b[?25l", end="")
   
   # setup
   history = {}
-  text = {}
   flags = {
     "fileopen" : False,
     "fileopen.text" : "",
@@ -74,12 +79,78 @@ def runinterpreter():
         position += 1
         endstrarr.insert(position-1, char)
 
-    text, history, flags = core.run("".join(endstrarr), history, text, flags)
+    text, history, flags = core.run("".join(endstrarr), history, text, flags, config)
 
     if flags["exit"]:
       done = True
 
   print("\x1b[?25h", end="")
 
+def loadconfig(filename, defaultconfig):
+  ftext = None
+  try:
+    with open(filename, "r") as file:
+      ftext = file.read()
+  except:
+    utilities.error("file error", "file '" + filename + "' does not exist")
+    return defaultconfig
+
+  lines = ftext.split("\n")
+  for line in range(len(lines)):
+    cline = lines[line].split(":")
+    if len(cline) < 2:
+      utilities.error("value error", "line '" + str(line+1) + "' is not formatted correctly")
+      return defaultconfig
+    configitem = cline[0]
+    setto = utilities.converttotype(":".join(cline[1:]))
+    if configitem in defaultconfig:
+      defaultconfig[configitem] = setto
+    else:
+      utilities.error("value error", "the set value on line '" + str(line+1) + "' does not exist")
+      return defaultconfig
+
+  # if everything goes as planned
+  return defaultconfig
+
 if __name__ == "__main__":
-  runinterpreter()
+  config = {
+    "merge.char" : "",
+  }
+  text = {}
+  runinterpretertf = True
+  
+  parser = argparse.ArgumentParser(
+    prog = 'stamp',
+    description = 'What the program does',
+    epilog = 'Text at the bottom of help')
+  
+  parser.add_argument('--config', help='loads a config file', dest="configfile")
+
+  parser.add_argument('--loadstr', help='loads a string value', nargs=2, metavar=("STRNAME", "FILENAME"), dest="loadstr")
+
+  parser.add_argument('--version', help='displays the version', action="store_true")
+
+  args = parser.parse_args()
+
+  if args.configfile:
+    config = loadconfig(args.configfile, config)
+
+  if args.loadstr:
+    try:
+      with open(args.loadstr[1], "r") as file:
+        toloadtext = file.read()
+      text[args.loadstr[0]] = toloadtext
+    except:
+      utilities.error("file error", "file '" + args.loadstr[1] + "' does not exist")
+      sys.exit()
+
+  if args.version:
+    runinterpretertf = False
+    versionstamp()
+
+  if runinterpretertf:
+    try:
+      runinterpreter(config, text)
+    except Exception as e:
+      print("\x1b[?25h", end="")
+      raise e

@@ -12,3 +12,4 @@ src
 .replit
 /venv/
 replit.nix
+configfile.config

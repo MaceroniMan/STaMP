@@ -29,9 +29,9 @@ def _merge(currentelement, charby):
         endr.append(mergeresult)
     return endr
 
-def merge(text, textstr, texvar):
-  text[texvar] = _merge(text[texvar], textstr)
-  return text
+def merge(text, textstr, textvar):
+  text[texvar] = _merge(text[textvar], textstr)
+  return text  
 
 def _prettyprint(item, indentlvl, c):
   rstr = ""
@@ -47,9 +47,9 @@ def _prettyprint(item, indentlvl, c):
 
   return rstr
 
-def display(text, texvar):
+def display(text, textvar):
   c = utilities.getcolors()
-  pp = _prettyprint(text[texvar], 0, c)[:-1]
+  pp = _prettyprint(text[texxtvar], 0, c)[:-1]
   print(pp)
 
 def _strip(currentelement):
@@ -63,4 +63,20 @@ def _strip(currentelement):
 
 def strip(text, textvar):
   text[textvar] = _strip(text[textvar])
+  return text
+
+def _append(currentelement, addchar, prepend):
+  if type(currentelement) == str:
+    if prepend:
+      return addchar + currentelement
+    else:
+      return currentelement + addchar
+  else:
+    rlist = []
+    for item in currentelement:
+      rlist.append(_append(item))
+    return rlist
+
+def append(text, textstr, textvar, prepend=False):
+  text[textvar] = _append(text[textvar], textstr, prepend)
   return text

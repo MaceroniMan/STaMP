@@ -14,11 +14,20 @@ def __short(item):
   else:
     return None
 
-def __parsequotes(text):
+def __parsequotes(text, strict=False):
   if text.startswith('"') and text.endswith('"'):
-    return text[1:-1]
+    return [text[1:-1], "str"]
   else:
-    return __short(text)
+    theshort = __short(text)
+    if theshort == None:
+      return None
+    elif strict:
+      if theshort.startswith("$") and theshort.endswith("$"):
+        return [theshort, "bad"]
+      else:
+        return [theshort, "short"]
+    else:
+      return [theshort, "short"]
 
 def __isvarname(text):
   for char in text:
@@ -73,19 +82,58 @@ def run(line, history, text, flags, config):
             utilities.error("syntax error", "invalid string")
         else:
           utilities.error("value error", "variable does not exist")
-          
-      if currentmatch["on_cmd"] == "MERGE":
+
+      elif currentmatch["on_cmd"] == "MERGE":
         if currentmatch["on_var"] in text:
-          textstr = __parsequotes(currentmatch["on_arg"])
-          if textstr != None:
-            text = functions.merge(text, textstr, currentmatch["on_var"])
-          else:
+          textstr = __parsequotes(currentmatch["on_arg"], strict=True)
+          mergechar = ""
+          if textstr[0] == None:
             utilities.error("syntax error", "invalid string")
+          elif textstr[0] != "bad":
+            mergechar = textstr[0]
+            text = functions.merge(text, mergechar, currentmatch["on_var"])
+          else: # if it is a special short
+            utilities.error("syntax error", "invalid string rep for this function")
         else:
           utilities.error("value error", "variable does not exist")
+
+      else:
+        utilities.error("function error", "the function '" + currentmatch["on_cmd"] + "' (ON) does not exist")
           
     elif currentmatch["to_cmd"] != None:
-      pass
+      if currentmatch["to_cmd"] == "APPEND":
+        if currentmatch["to_var"] in text:
+          textstr = __parsequotes(currentmatch["to_arg"], strict=True)
+          mergechar = ""
+          if textstr[0] == None:
+            utilities.error("syntax error", "invalid string")
+          elif textstr[0] != "bad":
+            mergechar = textstr[0]
+            text = functions.append(text, mergechar, currentmatch["to_var"], prepend=False)
+          else: # if it is a special short
+            utilities.error("syntax error", "invalid string rep for this function")
+        else:
+          utilities.error("value error", "variable does not exist")
+
+      else:
+        utilities.error("function error", "the function '" + currentmatch["to_cmd"] + "' (TO) does not exist")
+
+      if currentmatch["to_cmd"] == "PREPEND":
+        if currentmatch["to_var"] in text:
+          textstr = __parsequotes(currentmatch["to_arg"], strict=True)
+          mergechar = ""
+          if textstr[0] == None:
+            utilities.error("syntax error", "invalid string")
+          elif textstr[0] != "bad":
+            mergechar = textstr[0]
+            text = functions.append(text, mergechar, currentmatch["to_var"], prepend=True)
+          else: # if it is a special short
+            utilities.error("syntax error", "invalid string rep for this function")
+        else:
+          utilities.error("value error", "variable does not exist")
+
+      else:
+        utilities.error("function error", "the function '" + currentmatch["to_cmd"] + "' (TO) does not exist")
       
     elif currentmatch["ch_var"] != None:
       pass
@@ -99,10 +147,10 @@ def run(line, history, text, flags, config):
         else:
           utilities.error("syntax error", "invalid string")
           
-      if currentmatch["sg_cmd"] == "CLOSE":
+      elif currentmatch["sg_cmd"] == "CLOSE":
         utilities.error("scope error", "'CLOSE' function never opened")
         
-      if currentmatch["sg_cmd"] == "DISPLAY":
+      elif currentmatch["sg_cmd"] == "DISPLAY":
         if __isvarname(currentmatch["sg_arg"]):
           if currentmatch["sg_arg"] in text:
             functions.display(text, currentmatch["sg_arg"])
@@ -111,23 +159,27 @@ def run(line, history, text, flags, config):
         else:
           utilities.error("syntax error", "argument must be variable")
 
-      if currentmatch["sg_cmd"] == "STRIP":
+      elif currentmatch["sg_cmd"] == "STRIP":
         if __isvarname(currentmatch["sg_arg"]):
           if currentmatch["sg_arg"] in text:
             functions.strip(text, currentmatch["sg_arg"])
           else:
-            utilities.error("syntax error", "variable does not exist")
+            utilities.error("syntax error", "variable does not exist") # make this look better!!!
         else:
           utilities.error("syntax error", "argument must be variable")
           
-      if currentmatch["sg_cmd"] == "MERGE":
+      elif currentmatch["sg_cmd"] == "MERGE":
         if __isvarname(currentmatch["sg_arg"]):
           if currentmatch["sg_arg"] in text:
-            text = functions.merge(text, "", currentmatch["sg_arg"])
+            text = functions.merge(text, config["merge.char"], currentmatch["sg_arg"])
           else:
             utilities.error("syntax error", "variable does not exist")
         else:
           utilities.error("syntax error", "argument must be variable")
+
+      else:
+        utilities.error("function error", "the function '" + currentmatch["sg_cmd"] + "' does not exist")
+          
     else:
       utilities.error("syntax error", "no such function exists")
 

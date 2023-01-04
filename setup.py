@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
   name = "STaMP",
-  version = "0.2",
+  version = "0.3",
   author = "MaceroniMan",
   description = "The String Transformation and Manipulation Program is a small 'language' used for the editing of small to large sized strings using a fluent syntax.",
   url = "https://github.com/MaceroniMan/STaMP",

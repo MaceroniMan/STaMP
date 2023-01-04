@@ -3,7 +3,7 @@ import utilities
 import sys
 import argparse
 
-VERSION = "0.2"
+VERSION = "0.3"
 
 def versionstamp():
   colors = utilities.getcolors()
@@ -119,16 +119,13 @@ if __name__ == "__main__":
   text = {}
   runinterpretertf = True
   
-  parser = argparse.ArgumentParser(
-    prog = 'stamp',
-    description = 'What the program does',
-    epilog = 'Text at the bottom of help')
+  parser = argparse.ArgumentParser(prog = 'stamp')
   
-  parser.add_argument('--config', help='loads a config file', dest="configfile")
+  parser.add_argument('--config', '-c', help='loads a config file', dest="configfile")
 
-  parser.add_argument('--loadstr', help='loads a string value', nargs=2, metavar=("STRNAME", "FILENAME"), dest="loadstr")
+  parser.add_argument('--loadstr', '-l', help='loads a string value from a file', nargs=2, metavar=("STRNAME", "FILENAME"), dest="loadstr")
 
-  parser.add_argument('--version', help='displays the version', action="store_true")
+  parser.add_argument('--version', '-v', help='displays the version', action="store_true")
 
   args = parser.parse_args()
 

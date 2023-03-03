@@ -13,6 +13,7 @@ def _split(currentelement, splitby):
     return rlist
 
 def split(text, textstr, texvar):
+  print(textstr)
   text[texvar] = _split(text[texvar], textstr)
   return text
 
@@ -30,7 +31,7 @@ def _merge(currentelement, charby):
     return endr
 
 def merge(text, textstr, textvar):
-  text[texvar] = _merge(text[textvar], textstr)
+  text[textvar] = _merge(text[textvar], textstr)
   return text  
 
 def _prettyprint(item, indentlvl, c):
@@ -49,7 +50,7 @@ def _prettyprint(item, indentlvl, c):
 
 def display(text, textvar):
   c = utilities.getcolors()
-  pp = _prettyprint(text[texxtvar], 0, c)[:-1]
+  pp = _prettyprint(text[textvar], 0, c)[:-1]
   print(pp)
 
 def _strip(currentelement):
@@ -80,3 +81,41 @@ def _append(currentelement, addchar, prepend):
 def append(text, textstr, textvar, prepend=False):
   text[textvar] = _append(text[textvar], textstr, prepend)
   return text
+
+def _change(currentelement, editstr):
+  if type(currentelement) == str:
+    return None
+  else:
+    rlist = []
+    for item in currentelement:
+      rv = _change(item, editstr)
+      if rv == None:
+        return eval("currentelement[" + editstr + "]")
+      else:
+        rlist.append(rv)
+    return rlist
+
+def change(text, textvar, editnum):
+  text[textvar] = _change(text[textvar], editnum)
+  return text
+
+def _table(currentelement):
+  if type(currentelement) == str:
+    return None
+  else:
+    rstr = ""
+    for item in currentelement:
+      rs = _table(item)
+      if rs == None:
+        for i in currentelement:
+          rstr += i + "  "
+      else:
+        rstr += rs
+    return rstr + "\n"
+
+def table(text, textvar):
+  printvalue = _table(text[textvar])
+  if printvalue == None:
+    print(text[textvar])
+  else:
+    print(printvalue)

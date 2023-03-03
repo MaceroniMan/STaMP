@@ -1,28 +1,36 @@
-OPEN: mstr
-OMG OMG
-OMG OMG
-CLOSE: mstr
+Maybe make the output not actually print newlines
 
-# above is DONE
+[X] OPEN: mstr
+[X] OMG OMG
+[X] OMG OMG
+[X] CLOSE: mstr
 
-SPLIT: mstr ON newline
+[X] SPLIT: mstr ON newline
 
-SPLIT: mstr ON spaces
+[X] SPLIT: mstr ON spaces
 
-STRIP: mstr
+[X] STRIP: mstr
 
-mstr{0}
+[ ] mstr{0}
 
-APPEND: ", " TO mstr
+[X] APPEND: ", " TO mstr
 
-APPEND: "," ON <1-8,9,10> TO mstr
+[ ] APPEND: "," ON <1-8,9,10> TO mstr
 
-MERGE: mstr
+[X] MERGE: mstr
 
-mstr {:-2}
+[ ] mstr{:-2}
 
-APPEND: "(" TO mstr
+[X] APPEND: "(" TO mstr
 
-PREPEND: ")" TO mstr
+[X] PREPEND: ")" TO mstr
 
-OUT: mstr
+[X] DISPLAY: mstr
+
+[ ] REMOVE: mstr ON <1-3,6,8>
+
+[ ] COMBINE: mvar TO foovar
+
+[ ] UNION: mvar TO foovar
+
+[ ] SORT: mvar ON "descending"

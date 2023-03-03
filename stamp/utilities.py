@@ -139,7 +139,7 @@ def error(etype, etext):
 
 def syntaxhighlight(text, textvar):
 
-  matches = re.finditer(r'(ON|AT)|(EXIT|SPLIT|MERGE|OPEN|CLOSE|DISPLAY|STRIP):|{(\d*)}|(".*")|(newline|space|\*\*\*|charecter)|(\w*)', "".join(text))
+  matches = re.finditer(r'(ON|TO|WITH)|(EXIT|SPLIT|MERGE|OPEN|CLOSE|DISPLAY|STRIP|APPEND|PREPEND|TABLE):|{(\d*)}|(".*"|<.*>)|(newline|space|\*|charecter)|(\w*)', "".join(text))
 
   c = getcolors()
   

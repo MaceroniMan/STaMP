@@ -14,9 +14,37 @@ def __short(item):
   else:
     return None
 
+def __numarr(item):
+  numbers = ""
+  elements = item.split(",")
+  
+  for element in elements:
+    m = re.match(r'((?P<rangestart>\d+)-(?P<rangeend>\d+))|(?P<singledig>\d+)$', element)
+    if m == None:
+      continue
+    else:
+      matchargs = m.groupdict()
+      if matchargs["singledig"] != None:
+        numbers += matchargs["singledig"] + ","
+      elif matchargs["rangestart"] != None:
+        if int(matchargs["rangestart"]) > int(matchargs["rangeend"])+1:
+          utilities.error("value error", "starting value cannot be greater than ending value")
+          return None
+        else:
+          for i in range(int(matchargs["rangestart"]), int(matchargs["rangeend"])+1):
+            numbers += str(i) + ","
+
+  return numbers[:-1]
+
 def __parsequotes(text, strict=False):
   if text.startswith('"') and text.endswith('"'):
     return [text[1:-1], "str"]
+  elif text.startswith('<') and text.endswith('>'):
+    numarrdata = __numarr(text[1:-1])
+    if numarrdata == None:
+      return None
+    else:
+      return [numarrdata,  "numarr"]
   else:
     theshort = __short(text)
     if theshort == None:
@@ -41,10 +69,11 @@ def __isvarname(text):
 def run(line, history, text, flags, config):
   #((?P<on_cmd>\w+): (?P<on_var>\w+) ON (?P<on_arg>[\w]+|(".+")))
   #((?P<to_cmd>\w+): (?P<to_arg>[\w]+|(".+")) TO (?P<to_var>\w+))
+  #((?P<wh_cmd>\w+): (?P<wh_var1>\w+) WITH (?P<wh_var2>\w+))
   #((?P<ch_var>\w+)\s*(\{(?P<ch_cond>[-:]*\d*)\}))
   #((?P<sg_cmd>\w+): (?P<sg_arg>\w+))
 
-  m = re.match(r'((?P<on_cmd>\w+): (?P<on_var>\w+) ON (?P<on_arg>[\w]+|(".+")))|((?P<to_cmd>\w+): (?P<to_arg>[\w]+|(".+")) TO (?P<to_var>\w+))|((?P<ch_var>\w+)\s*(\{(?P<ch_cond>[-:]*\d*)\}))|((?P<sg_cmd>\w+): (?P<sg_arg>\w+))', line)
+  m = re.match(r'((?P<on_cmd>\w+): (?P<on_var>\w+) ON (?P<on_arg>[\w]+|(".+")|((?P<wh_cmd>\w+): (?P<wh_var1>\w+) WITH (?P<wh_var2>\w+))|(<.*>)))|((?P<to_cmd>\w+): (?P<to_arg>[\w]+|(".+"|(<.*>))) TO (?P<to_var>\w+))|((?P<ch_var>\w+)\s*(\{(?P<ch_cond>[-:]*\d*)\}))|((?P<sg_cmd>\w+): (?P<sg_arg>\w+))', line)
 
   if m == None:
     currentmatch = {}
@@ -77,7 +106,7 @@ def run(line, history, text, flags, config):
         if currentmatch["on_var"] in text:
           textstr = __parsequotes(currentmatch["on_arg"])
           if textstr != None:
-            text = functions.split(text, textstr, currentmatch["on_var"])
+            text = functions.split(text, textstr[0], currentmatch["on_var"])
           else:
             utilities.error("syntax error", "invalid string")
         else:
@@ -99,6 +128,9 @@ def run(line, history, text, flags, config):
 
       else:
         utilities.error("function error", "the function '" + currentmatch["on_cmd"] + "' (ON) does not exist")
+
+    elif currentmatch["wh_cmd"] != None:
+      pass
           
     elif currentmatch["to_cmd"] != None:
       if currentmatch["to_cmd"] == "APPEND":
@@ -115,10 +147,7 @@ def run(line, history, text, flags, config):
         else:
           utilities.error("value error", "variable does not exist")
 
-      else:
-        utilities.error("function error", "the function '" + currentmatch["to_cmd"] + "' (TO) does not exist")
-
-      if currentmatch["to_cmd"] == "PREPEND":
+      elif currentmatch["to_cmd"] == "PREPEND":
         if currentmatch["to_var"] in text:
           textstr = __parsequotes(currentmatch["to_arg"], strict=True)
           mergechar = ""
@@ -136,7 +165,10 @@ def run(line, history, text, flags, config):
         utilities.error("function error", "the function '" + currentmatch["to_cmd"] + "' (TO) does not exist")
       
     elif currentmatch["ch_var"] != None:
-      pass
+      if currentmatch["ch_var"] in text:
+        functions.change(text, currentmatch["ch_var"], currentmatch["ch_cond"])
+      else:
+        utilities.error("syntax error", "argument must be variable")
       
     elif currentmatch["sg_cmd"] != None:
       if currentmatch["sg_cmd"] == "OPEN":
@@ -159,6 +191,15 @@ def run(line, history, text, flags, config):
         else:
           utilities.error("syntax error", "argument must be variable")
 
+      elif currentmatch["sg_cmd"] == "TABLE":
+        if __isvarname(currentmatch["sg_arg"]):
+          if currentmatch["sg_arg"] in text:
+            functions.table(text, currentmatch["sg_arg"])
+          else:
+            utilities.error("syntax error", "variable does not exist")
+        else:
+          utilities.error("syntax error", "argument must be variable")
+      
       elif currentmatch["sg_cmd"] == "STRIP":
         if __isvarname(currentmatch["sg_arg"]):
           if currentmatch["sg_arg"] in text:

@@ -3,7 +3,7 @@ import utilities
 import sys
 import argparse
 
-VERSION = "0.3"
+VERSION = "1.0"
 
 def versionstamp():
   colors = utilities.getcolors()

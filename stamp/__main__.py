@@ -21,7 +21,7 @@ def runinterpreter(config, text):
   print("\x1b[?25l", end="")
   
   # setup
-  history = {}
+  history = [[], []]
   flags = {
     "fileopen" : False,
     "fileopen.text" : "",

@@ -13,7 +13,6 @@ def _split(currentelement, splitby):
     return rlist
 
 def split(text, textstr, texvar):
-  print(textstr)
   text[texvar] = _split(text[texvar], textstr)
   return text
 
@@ -75,7 +74,7 @@ def _append(currentelement, addchar, prepend):
   else:
     rlist = []
     for item in currentelement:
-      rlist.append(_append(item))
+      rlist.append(_append(item, addchar, prepend))
     return rlist
 
 def append(text, textstr, textvar, prepend=False):
@@ -119,3 +118,16 @@ def table(text, textvar):
     print(text[textvar])
   else:
     print(printvalue)
+
+def _replace(currentelement, findstr, replacewith):
+  if type(currentelement) == str:
+    return currentelement.replace(findstr, replacewith)
+  else:
+    rlist = []
+    for item in currentelement:
+      rlist.append(_replace(item, findstr, replacewith))
+    return rlist
+
+def replace(text, textvar, findstr, replacewith):
+  text[textvar] = _replace(text[textvar], findstr, replacewith)
+  return text
